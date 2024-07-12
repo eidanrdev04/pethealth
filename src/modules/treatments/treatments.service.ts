@@ -18,7 +18,7 @@ export class TreatmentsService {
     if (!pet) {
       throw new NotFoundException(`Mascota con ID ${petId} no encontrada`);
     }
-    return this.prisma.treatment.create({
+    const treatment = await this.prisma.treatment.create({
       data: {
         name,
         description,
@@ -27,6 +27,10 @@ export class TreatmentsService {
         petId
       },
     });
+    return {
+      message: 'Tratamiento creado exitosamente',
+      treatment,
+    };
   }
 
   async findOne(id: number) {
@@ -37,26 +41,34 @@ export class TreatmentsService {
     if (!treatment) {
       throw new NotFoundException(`Tratamiento con ID ${id} no encontrado`);
     }
-    return treatment;
+    return {
+      message: 'Tratamiento encontrado',
+      treatment,
+    };
   }
 
   async findAll() {
-    return this.prisma.treatment.findMany({
+    const treatments = await this.prisma.treatment.findMany({
       include: { pet: true },
     });
+    return {
+      message: 'Tratamientos encontrados',
+      treatments,
+    };
   }
 
   async updateTreatment(id: number, data: UpdateTreatmentDto) {
     const { name, description, startDate, endDate, petId } = data;
     const parsedStartDate = new Date(startDate);
     const parsedEndDate = new Date(endDate);
-    if (petId) {
-      const pet = await this.prisma.pet.findUnique({ where: { id: petId } });
-      if (!pet) {
-        throw new NotFoundException(`Mascota con ID ${petId} no encontrada`);
-      }
+    if (!name || !description || !startDate || !endDate || !petId) {
+      throw new BadRequestException('Todos los campos son requeridos para actualizar un tratamiento');
     }
-    return this.prisma.treatment.update({
+    const pet = await this.prisma.pet.findUnique({ where: { id: petId } });
+    if (!pet) {
+      throw new NotFoundException(`Mascota con ID ${petId} no encontrada`);
+    }
+    const updatedTreatment = await this.prisma.treatment.update({
       where: { id },
       data: {
         name,
@@ -66,9 +78,21 @@ export class TreatmentsService {
         petId
       },
     });
+    return {
+      message: 'Tratamiento actualizado exitosamente',
+      treatment: updatedTreatment,
+    };
   }
 
   async deleteTreatment(id: number) {
-    return this.prisma.treatment.delete({ where: { id } });
+    const treatment = await this.prisma.treatment.findUnique({ where: { id } });
+    if (!treatment) {
+      throw new NotFoundException(`Tratamiento con ID ${id} no encontrado`);
+    }
+    await this.prisma.treatment.delete({ where: { id } });
+    return {
+      message: 'Tratamiento eliminado exitosamente',
+      treatment,
+    };
   }
 }
