@@ -13,11 +13,18 @@ export class PetsService {
     if (!name || !species || !breed || !birthDate || !color || !userid) {
       throw new BadRequestException('Todos los campos son requeridos');
     }
+    if (species !== 'Perro' && species !== 'Gato') {
+      throw new BadRequestException('La especie debe ser Perro o Gato');
+    }
     const user = await this.prisma.user.findUnique({ where: { id: userid } });
     if (!user) {
       throw new NotFoundException(`Usuario con ID ${userid} no encontrado`);
     }
     const parsedBirthDate = new Date(birthDate);
+    const today = new Date();
+    if (parsedBirthDate > today) {
+      throw new BadRequestException('La fecha de nacimiento no puede estar en el futuro');
+    }
     const pet = await this.prisma.pet.create({
       data: {
         name,
@@ -82,7 +89,6 @@ export class PetsService {
         name: pet.user.name,
       },
     }));
-
     return {
       message: 'Mascotas encontradas',
       pets: formattedPets,
@@ -92,6 +98,9 @@ export class PetsService {
   async updatePet(id: number, data: UpdatePetDto) {
     const { name, species, breed, birthDate, color, userid } = data;
     const pet = await this.prisma.pet.findUnique({ where: { id } });
+    if (species !== 'Perro' && species !== 'Gato') {
+      throw new BadRequestException('La especie debe ser Perro o Gato');
+    }
     if (!pet) {
       throw new NotFoundException(`Mascota con ID ${id} no encontrada`);
     }
@@ -102,6 +111,10 @@ export class PetsService {
       }
     }
     const parsedBirthDate = new Date(birthDate);
+    const today = new Date();
+    if (parsedBirthDate > today) {
+      throw new BadRequestException('La fecha de nacimiento no puede estar en el futuro');
+    }
     const updatedPet = await this.prisma.pet.update({
       where: { id },
       data: {
