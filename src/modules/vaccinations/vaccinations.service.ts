@@ -2,7 +2,6 @@ import { BadRequestException, Injectable, NotFoundException } from '@nestjs/comm
 import { CreateVaccinationDto } from './dto/create-vaccination.dto';
 import { UpdateVaccinationDto } from './dto/update-vaccination.dto';
 import { PrismaService } from '../prisma/prisma.service';
-
 @Injectable()
 export class VaccinationsService {
   constructor(private prisma: PrismaService) {}
@@ -12,17 +11,19 @@ export class VaccinationsService {
     if (!name || !applicationDate || !weight || !petId || !vaccinationRecordId) {
       throw new BadRequestException('Todos los campos son requeridos');
     }
-
     const pet = await this.prisma.pet.findUnique({ where: { id: petId } });
     if (!pet) {
       throw new NotFoundException(`Mascota con ID ${petId} no encontrada`);
     }
-
     const vaccinationRecord = await this.prisma.vaccinationRecord.findUnique({ where: { id: vaccinationRecordId } });
     if (!vaccinationRecord) {
       throw new NotFoundException(`Registro de vacuna con ID ${vaccinationRecordId} no encontrado`);
     }
     const parsedApplicationDate = new Date(applicationDate);
+    const currentDate = new Date();
+    if (parsedApplicationDate > currentDate || parsedApplicationDate < currentDate) {
+      throw new BadRequestException('La fecha de aplicación debe ser la fecha actual');
+    }
     const vaccination = await this.prisma.vaccination.create({
       data: {
         name,
@@ -70,7 +71,6 @@ export class VaccinationsService {
 
   async update(id: number, updateVaccinationDto: UpdateVaccinationDto) {
     const { name, applicationDate, weight, petId, vaccinationRecordId } = updateVaccinationDto;
-
     const vaccination = await this.prisma.vaccination.findUnique({ where: { id } });
     if (!vaccination) {
       throw new NotFoundException(`Vacuna con ID ${id} no encontrada`);
@@ -84,6 +84,10 @@ export class VaccinationsService {
       throw new NotFoundException(`Registro de vacuna con ID ${vaccinationRecordId} no encontrado`);
     }
     const parsedApplicationDate = new Date(applicationDate);
+    const currentDate = new Date();
+    if (parsedApplicationDate > currentDate || parsedApplicationDate < currentDate) {
+      throw new BadRequestException('La fecha de aplicación debe ser la fecha actual');
+    }
     const updatedVaccination = await this.prisma.vaccination.update({
       where: { id },
       data: {
