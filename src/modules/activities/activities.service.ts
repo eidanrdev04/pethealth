@@ -17,7 +17,7 @@ export class ActivitiesService {
     if (!pet) {
       throw new NotFoundException(`Mascota con ID ${petId} no encontrada`);
     }
-    return this.prisma.activity.create({
+    const activity = await this.prisma.activity.create({
       data: {
         activityType,
         description,
@@ -25,12 +25,20 @@ export class ActivitiesService {
         petId
       },
     });
+    return {
+      message: 'Actividad creada exitosamente',
+      activity,
+    };
   }
 
   async findAllActivities() {
-    return this.prisma.activity.findMany({
+    const activities = await this.prisma.activity.findMany({
       include: { pet: true },
     });
+    return {
+      message: 'Actividades encontradas',
+      activities,
+    };
   }
 
   async findActivityById(id: number) {
@@ -41,8 +49,10 @@ export class ActivitiesService {
     if (!activity) {
       throw new NotFoundException(`Actividad con ID ${id} no encontrada`);
     }
-
-    return activity;
+    return {
+      message: 'Actividad encontrada',
+      activity,
+    };
   }
 
   async updateActivity(id: number, updateActivityDto: UpdateActivityDto) {
@@ -54,7 +64,7 @@ export class ActivitiesService {
         throw new NotFoundException(`Mascota con ID ${petId} no encontrada`);
       }
     }
-    return this.prisma.activity.update({
+    const updatedActivity = await this.prisma.activity.update({
       where: { id },
       data: {
         activityType,
@@ -63,11 +73,21 @@ export class ActivitiesService {
         petId
       },
     });
+    return {
+      message: 'Actividad actualizada exitosamente',
+      activity: updatedActivity,
+    };
   }
 
   async deleteActivity(id: number) {
-    return this.prisma.activity.delete({
-      where: { id },
-    });
+    const activity = await this.prisma.activity.findUnique({ where: { id } });
+    if (!activity) {
+      throw new NotFoundException(`Actividad con ID ${id} no encontrada`);
+    }
+    await this.prisma.activity.delete({ where: { id } });
+    return {
+      message: 'Actividad eliminada exitosamente',
+      activity,
+    };
   }
 }
