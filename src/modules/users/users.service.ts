@@ -10,14 +10,8 @@ export class UsersService {
 
   async createUser(data: { name: string; email: string; password: string }) {
     const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
-    if (!data.name || !data.email || !data.password) {
-      throw new BadRequestException('Todos los campos son requeridos');
-    }
     if (!emailRegex.test(data.email)) {
       throw new ConflictException('Correo inválido');
-    }
-    if (data.password.length < 8) {
-      throw new ConflictException('Contraseña debe ser de al menos 8 caracteres');
     }
     const existingUser = await this.findByEmail(data.email);
     if (existingUser) {
@@ -87,9 +81,6 @@ export class UsersService {
 
     let updatedUser;
     if (password) {
-      if (password.length < 8) {
-        throw new ConflictException('Contraseña debe ser de al menos 8 caracteres');
-      }
       const hashedPassword = await bcrypt.hash(password, 10);
       updatedUser = await this.prisma.user.update({
         where: { id },

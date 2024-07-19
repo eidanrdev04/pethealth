@@ -2,15 +2,13 @@ import { BadRequestException, Injectable, NotFoundException } from '@nestjs/comm
 import { CreateVaccinationDto } from './dto/create-vaccination.dto';
 import { UpdateVaccinationDto } from './dto/update-vaccination.dto';
 import { PrismaService } from '../prisma/prisma.service';
+
 @Injectable()
 export class VaccinationsService {
   constructor(private prisma: PrismaService) {}
 
   async create(createVaccinationDto: CreateVaccinationDto) {
     const { name, applicationDate, weight, petId, vaccinationRecordId } = createVaccinationDto;
-    if (!name || !applicationDate || !weight || !petId || !vaccinationRecordId) {
-      throw new BadRequestException('Todos los campos son requeridos');
-    }
     const pet = await this.prisma.pet.findUnique({ where: { id: petId } });
     if (!pet) {
       throw new NotFoundException(`Mascota con ID ${petId} no encontrada`);

@@ -22,9 +22,6 @@ constructor(private prisma: PrismaService) {}
 
 async create(createVaccinationRecordDto: CreateVaccinationrecordDto) {
   const { recordType, petId } = createVaccinationRecordDto;
-  if (!recordType || !petId) {
-    throw new BadRequestException('Todos los campos son requeridos');
-  }
   const pet = await this.prisma.pet.findUnique({ where: { id: petId } });
   if (!pet) {
     throw new NotFoundException(`Mascota con ID ${petId} no encontrada`);

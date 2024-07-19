@@ -9,9 +9,6 @@ export class TreatmentsService {
 
   async createTreatment(createTreatmentDto: CreateTreatmentDto) {
     const { name, description, startDate, endDate, petId } = createTreatmentDto;
-    if (!name || !description || !startDate || !endDate || !petId) {
-      throw new BadRequestException('Todos los campos son requeridos para crear un tratamiento');
-    }
     const parsedStartDate = new Date(startDate);
     const parsedEndDate = new Date(endDate);
     const pet = await this.prisma.pet.findUnique({ where: { id: petId } });
@@ -61,9 +58,6 @@ export class TreatmentsService {
     const { name, description, startDate, endDate, petId } = data;
     const parsedStartDate = new Date(startDate);
     const parsedEndDate = new Date(endDate);
-    if (!name || !description || !startDate || !endDate || !petId) {
-      throw new BadRequestException('Todos los campos son requeridos para actualizar un tratamiento');
-    }
     const pet = await this.prisma.pet.findUnique({ where: { id: petId } });
     if (!pet) {
       throw new NotFoundException(`Mascota con ID ${petId} no encontrada`);

@@ -9,16 +9,13 @@ export class ConsultationsService {
 
   async createConsultation(createConsultationDto: CreateConsultationDto) {
     const { veterinarian, description, date, petId } = createConsultationDto;
-    if (!veterinarian || !description || !date || !petId) {
-      throw new BadRequestException('Todos los campos son requeridos para crear una consulta.');
-    }
     const pet = await this.prisma.pet.findUnique({ where: { id: petId } });
     if (!pet) {
       throw new NotFoundException(`Mascota con ID ${petId} no encontrada`);
     }
     const parsedDate = new Date(date);
 
-    return this.prisma.consultation.create({
+    const consultation = await this.prisma.consultation.create({
       data: {
         veterinarian,
         description,
@@ -26,6 +23,11 @@ export class ConsultationsService {
         petId
       },
     });
+
+    return {
+      message: 'Consulta creada exitosamente',
+      consultation,
+    };
   }
 
   async findOne(id: number) {
@@ -36,13 +38,20 @@ export class ConsultationsService {
     if (!consultation) {
       throw new NotFoundException(`Consulta con ID ${id} no encontrada`);
     }
-    return consultation;
+    return {
+      message: 'Consulta encontrada',
+      consultation,
+    };
   }
 
   async findAll() {
-    return this.prisma.consultation.findMany({
+    const consultations = await this.prisma.consultation.findMany({
       include: { pet: true },
     });
+    return {
+      message: 'Consultas encontradas',
+      consultations,
+    };
   }
 
   async updateConsultation(id: number, data: UpdateConsultationDto) {
@@ -53,16 +62,30 @@ export class ConsultationsService {
         throw new NotFoundException(`Mascota con ID ${petId} no encontrada`);
       }
     }
-    return this.prisma.consultation.update({
+    const updatedConsultation = await this.prisma.consultation.update({
       where: { id },
       data: {
         ...rest,
         petId,
       },
     });
+
+    return {
+      message: 'Consulta actualizada exitosamente',
+      consultation: updatedConsultation,
+    };
   }
 
   async deleteConsultation(id: number) {
-    return this.prisma.consultation.delete({ where: { id } });
+    const consultation = await this.prisma.consultation.findUnique({ where: { id } });
+    if (!consultation) {
+      throw new NotFoundException(`Consulta con ID ${id} no encontrada`);
+    }
+    await this.prisma.consultation.delete({ where: { id } });
+
+    return {
+      message: 'Consulta eliminada exitosamente',
+      consultation,
+    };
   }
 }

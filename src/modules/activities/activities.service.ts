@@ -9,9 +9,6 @@ export class ActivitiesService {
 
   async createActivity(createActivityDto: CreateActivityDto) {
     const { activityType, description, date, petId } = createActivityDto;
-    if (!activityType || !description || !date || !petId) {
-      throw new BadRequestException('Todos los campos son obligatorios');
-    }
     const parsedDate = new Date(date);
     const pet = await this.prisma.pet.findUnique({ where: { id: petId } });
     if (!pet) {
