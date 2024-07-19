@@ -1,8 +1,10 @@
-import { Controller, Get, Post, Body, Put, Param, Delete } from '@nestjs/common';
+import { Controller, Get, Post, Body, Put, Param, Delete, UseGuards } from '@nestjs/common';
 import { VaccinationsService } from './vaccinations.service';
 import { CreateVaccinationDto } from './dto/create-vaccination.dto';
 import { UpdateVaccinationDto } from './dto/update-vaccination.dto';
+import { JwtAuthGuard } from 'src/guards/auth/jwt-auth.guard';
 
+@UseGuards(JwtAuthGuard)
 @Controller('vaccinations')
 export class VaccinationsController {
   constructor(private readonly vaccinationsService: VaccinationsService) {}

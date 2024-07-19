@@ -1,8 +1,10 @@
-import { Controller, Post, Body, Get, Param, Put, Delete, NotFoundException, BadRequestException } from '@nestjs/common';
+import { Controller, Post, Body, Get, Param, Put, Delete, NotFoundException, BadRequestException, UseGuards } from '@nestjs/common';
 import { PetsService } from './pets.service';
 import { CreatePetDto } from './dto/create-pet.dto';
 import { UpdatePetDto } from './dto/update-pet.dto';
+import { JwtAuthGuard } from 'src/guards/auth/jwt-auth.guard';
 
+@UseGuards(JwtAuthGuard)
 @Controller('pets')
 export class PetsController {
   constructor(private petsService: PetsService) {}
@@ -18,17 +20,17 @@ export class PetsController {
   }
 
   @Get(':id')
-  async getPetById(@Param('id') id: string) {
+  async getPetById(@Param('id') id: number) {
     return this.petsService.findOne(Number(id));
   }
 
   @Put(':id')
-  async updatePet(@Param('id') id: string, @Body() updatePetDto: UpdatePetDto) {
+  async updatePet(@Param('id') id: number, @Body() updatePetDto: UpdatePetDto) {
     return this.petsService.updatePet(Number(id), updatePetDto);
   }
 
   @Delete(':id')
-  async deletePet(@Param('id') id: string) {
+  async deletePet(@Param('id') id: number) {
     return this.petsService.deletePet(Number(id));
   }
 }
