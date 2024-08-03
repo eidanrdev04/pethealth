@@ -156,14 +156,14 @@ async update(id: number, updateVaccinationRecordDto: UpdateVaccinationrecordDto)
 }
 
 async delete(id: number) {
-  const vaccionationrecord = await this.prisma.vaccinationRecord.findUnique({ where: { id } });
-  if (!vaccionationrecord) {
+  const vaccinationrecord = await this.prisma.vaccinationRecord.findUnique({ where: { id } });
+  if (!vaccinationrecord) {
     throw new NotFoundException(`Vaccination Record con ID ${id} no encontrada`);
   }
   await this.prisma.vaccinationRecord.delete({ where: { id } });
   return {
     message: 'Vaccination Record eliminada exitosamente',
-    vaccionationrecord,
+    vaccinationrecord,
   };
 }
 }
