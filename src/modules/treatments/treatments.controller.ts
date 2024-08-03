@@ -2,7 +2,7 @@ import { Controller, Get, Post, Body, Put, Param, Delete, UseGuards } from '@nes
 import { TreatmentsService } from './treatments.service';
 import { CreateTreatmentDto } from './dto/create-treatment.dto';
 import { UpdateTreatmentDto } from './dto/update-treatment.dto';
-import { JwtAuthGuard } from 'src/guards/auth/jwt-auth.guard';
+import { JwtAuthGuard } from '../../guards/auth/jwt-auth.guard';
 
 @UseGuards(JwtAuthGuard)
 @Controller('treatments')

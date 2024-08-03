@@ -2,7 +2,7 @@ import { Controller, Get, Post, Body, Put, Param, Delete, UseGuards } from '@nes
 import { ActivitiesService } from './activities.service';
 import { CreateActivityDto } from './dto/create-activity.dto';
 import { UpdateActivityDto } from './dto/update-activity.dto';
-import { JwtAuthGuard } from 'src/guards/auth/jwt-auth.guard';
+import { JwtAuthGuard } from '../../guards/auth/jwt-auth.guard';
 
 @UseGuards(JwtAuthGuard)
 @Controller('activities')

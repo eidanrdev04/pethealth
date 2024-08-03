@@ -2,7 +2,7 @@ import { Controller, Post, Body, Get, Param, Put, Delete, NotFoundException, Bad
 import { PetsService } from './pets.service';
 import { CreatePetDto } from './dto/create-pet.dto';
 import { UpdatePetDto } from './dto/update-pet.dto';
-import { JwtAuthGuard } from 'src/guards/auth/jwt-auth.guard';
+import { JwtAuthGuard } from '../../guards/auth/jwt-auth.guard';
 
 @UseGuards(JwtAuthGuard)
 @Controller('pets')

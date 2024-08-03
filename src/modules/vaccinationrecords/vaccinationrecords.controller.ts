@@ -2,7 +2,7 @@ import { Controller, Get, Post, Body, Put, Param, Delete, UseGuards } from '@nes
 import { VaccinationrecordService } from './vaccinationrecords.service';
 import { CreateVaccinationrecordDto } from './dto/create-vaccinationrecord.dto';
 import { UpdateVaccinationrecordDto } from './dto/update-vaccinationrecord.dto';
-import { JwtAuthGuard } from 'src/guards/auth/jwt-auth.guard';
+import { JwtAuthGuard } from '../../guards/auth/jwt-auth.guard';
 
 @UseGuards(JwtAuthGuard)
 @Controller('vaccination-records')
