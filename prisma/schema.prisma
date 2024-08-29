@@ -29,7 +29,7 @@ model Pet {
   birthDate        DateTime
   color            String
   userid          Int
-  user            User            @relation(fields: [userid], references: [id])
+  user            User            @relation(fields: [userid], references: [id], onDelete: Cascade)
   vaccinations     Vaccination[]
   treatments       Treatment[]
   activities       Activity[]
@@ -45,7 +45,7 @@ model Vaccination {
   petId          Int     
   pet            Pet     @relation(fields: [petId], references: [id])
   vaccinationRecordId Int
-  vaccinationRecord VaccinationRecord @relation(fields: [vaccinationRecordId], references: [id])
+  vaccinationRecord VaccinationRecord @relation(fields: [vaccinationRecordId], references: [id], onDelete: Cascade)
 }
 
 model Treatment {
@@ -55,7 +55,7 @@ model Treatment {
   startDate  DateTime
   endDate    DateTime
   petId      Int 
-  pet        Pet      @relation(fields: [petId], references: [id])
+  pet        Pet      @relation(fields: [petId], references: [id], onDelete: Cascade)
 }
 
 model Activity {
@@ -64,7 +64,7 @@ model Activity {
   description  String
   date         DateTime
   petId        Int 
-  pet          Pet      @relation(fields: [petId], references: [id])
+  pet          Pet      @relation(fields: [petId], references: [id], onDelete: Cascade)
 }
 
 model Consultation {
@@ -73,13 +73,13 @@ model Consultation {
   description  String
   date         DateTime
   petId        Int      
-  pet          Pet      @relation(fields: [petId], references: [id])
+  pet          Pet      @relation(fields: [petId], references: [id], onDelete: Cascade)
 }
 
 model VaccinationRecord {
   id         Int      @id @default(autoincrement())
   recordType String
   petId      Int      
-  pet        Pet      @relation(fields: [petId], references: [id])
+  pet        Pet      @relation(fields: [petId], references: [id], onDelete: Cascade)
   vaccinations Vaccination[]
 }
