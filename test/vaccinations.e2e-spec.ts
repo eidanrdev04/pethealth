@@ -36,7 +36,7 @@ describe('Vaccinations E2E', () => {
   beforeEach(async () => {
     await prisma.vaccination.deleteMany();
     await prisma.pet.deleteMany({ where: { name: 'Max' } });
-  },10000);
+  });
 
   const getCurrentDate = (): string => {
     const now = new Date();
@@ -93,7 +93,7 @@ describe('Vaccinations E2E', () => {
 
     expect(response.body.message).toBe('Vacuna creada exitosamente');
     expect(response.body.vaccination.name).toBe(createVaccinationDto.name);
-  }, 10000);
+  }, 7000);
 
   it('debería obtener todas las vacunaciones', async () => {
     const createPetDto = {

@@ -20,7 +20,7 @@ export class ConsultationsService {
         veterinarian,
         description,
         date: parsedDate,
-        petId
+        petId,
       },
     });
 
@@ -55,19 +55,23 @@ export class ConsultationsService {
   }
 
   async updateConsultation(id: number, data: UpdateConsultationDto) {
-    const { petId, ...rest } = data;
+    const { petId, date, ...rest } = data;
+
     if (petId) {
       const pet = await this.prisma.pet.findUnique({ where: { id: petId } });
       if (!pet) {
         throw new NotFoundException(`Mascota con ID ${petId} no encontrada`);
       }
     }
+
+    const updateData: any = { ...rest, petId };
+    if (date) {
+      updateData.date = new Date(date);
+    }
+
     const updatedConsultation = await this.prisma.consultation.update({
       where: { id },
-      data: {
-        ...rest,
-        petId,
-      },
+      data: updateData,
     });
 
     return {
