@@ -9,7 +9,9 @@ export class AppController {
   @UseGuards(JwtAuthGuard)
   @Get('protected')
   getProtectedData() {
-    return { message: 'Esta ruta es la que esta protegida' };
+    return {
+      email: "eidan@icloud.com",
+    };
   }
 
   @Get('public')
