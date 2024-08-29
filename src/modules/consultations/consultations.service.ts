@@ -7,6 +7,11 @@ import { PrismaService } from '../prisma/prisma.service';
 export class ConsultationsService {
   constructor(private prisma: PrismaService) {}
 
+  /**
+   * Crea una nueva consulta.
+   * @param createConsultationDto Datos de la consulta a crear.
+   * @returns Mensaje de éxito y datos de la consulta creada.
+   */
   async createConsultation(createConsultationDto: CreateConsultationDto) {
     const { veterinarian, description, date, petId } = createConsultationDto;
     const pet = await this.prisma.pet.findUnique({ where: { id: petId } });
@@ -20,7 +25,7 @@ export class ConsultationsService {
         veterinarian,
         description,
         date: parsedDate,
-        petId
+        petId,
       },
     });
 
@@ -30,6 +35,11 @@ export class ConsultationsService {
     };
   }
 
+  /**
+   * Obtiene una consulta por su ID.
+   * @param id ID de la consulta a obtener.
+   * @returns Mensaje de éxito y datos de la consulta encontrada.
+   */
   async findOne(id: number) {
     const consultation = await this.prisma.consultation.findUnique({
       where: { id },
@@ -44,6 +54,10 @@ export class ConsultationsService {
     };
   }
 
+  /**
+   * Obtiene todas las consultas.
+   * @returns Mensaje de éxito y lista de todas las consultas encontradas.
+   */
   async findAll() {
     const consultations = await this.prisma.consultation.findMany({
       include: { pet: true },
@@ -54,20 +68,30 @@ export class ConsultationsService {
     };
   }
 
+  /**
+   * Actualiza una consulta existente.
+   * @param id ID de la consulta a actualizar.
+   * @param data Datos de la consulta a actualizar.
+   * @returns Mensaje de éxito y datos de la consulta actualizada.
+   */
   async updateConsultation(id: number, data: UpdateConsultationDto) {
-    const { petId, ...rest } = data;
+    const { petId, date, ...rest } = data;
+
     if (petId) {
       const pet = await this.prisma.pet.findUnique({ where: { id: petId } });
       if (!pet) {
         throw new NotFoundException(`Mascota con ID ${petId} no encontrada`);
       }
     }
+
+    const updateData: any = { ...rest, petId };
+    if (date) {
+      updateData.date = new Date(date);
+    }
+
     const updatedConsultation = await this.prisma.consultation.update({
       where: { id },
-      data: {
-        ...rest,
-        petId,
-      },
+      data: updateData,
     });
 
     return {
@@ -76,6 +100,11 @@ export class ConsultationsService {
     };
   }
 
+  /**
+   * Elimina una consulta por su ID.
+   * @param id ID de la consulta a eliminar.
+   * @returns Mensaje de éxito y datos de la consulta eliminada.
+   */
   async deleteConsultation(id: number) {
     const consultation = await this.prisma.consultation.findUnique({ where: { id } });
     if (!consultation) {

@@ -3,11 +3,10 @@ import { AppController } from './app.controller';
 import { AppService } from './app.service';
 import { PrismaService } from './modules/prisma/prisma.service';
 
-describe('prueba del controlador AppController', () => {
+describe('AppController', () => {
   let appController: AppController;
 
   beforeEach(async () => {
-    // emsanblar 
     const app: TestingModule = await Test.createTestingModule({
       controllers: [AppController],
       providers: [AppService, PrismaService],

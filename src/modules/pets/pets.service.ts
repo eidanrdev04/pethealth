@@ -8,6 +8,13 @@ import { Prisma } from '@prisma/client';
 export class PetsService {
   constructor(private prisma: PrismaService) {}
 
+  /**
+   * Crea una nueva mascota.
+   * @param createPetDto Datos de la mascota a crear.
+   * @returns Mensaje de éxito y datos de la mascota creada.
+   * @throws {NotFoundException} Si el usuario asociado no se encuentra.
+   * @throws {BadRequestException} Si la fecha de nacimiento está en el futuro.
+   */
   async createPet(createPetDto: CreatePetDto) {
     const { name, species, breed, birthDate, color, userid } = createPetDto;
     const user = await this.prisma.user.findUnique({ where: { id: userid } });
@@ -35,6 +42,12 @@ export class PetsService {
     };
   }
 
+  /**
+   * Obtiene una mascota por ID.
+   * @param id ID de la mascota a obtener.
+   * @returns Mensaje de éxito y datos de la mascota encontrada.
+   * @throws {NotFoundException} Si la mascota no se encuentra.
+   */
   async findOne(id: number) {
     const pet = await this.prisma.pet.findUnique({
       where: { id },
@@ -61,6 +74,10 @@ export class PetsService {
     };
   }
 
+  /**
+   * Obtiene todas las mascotas.
+   * @returns Mensaje de éxito y lista de todas las mascotas.
+   */
   async findAll() {
     const pets = await this.prisma.pet.findMany({
       include: {
@@ -89,23 +106,39 @@ export class PetsService {
     };
   }
 
+  /**
+   * Actualiza una mascota por ID.
+   * @param id ID de la mascota a actualizar.
+   * @param data Datos de la mascota a actualizar.
+   * @returns Mensaje de éxito y datos de la mascota actualizada.
+   * @throws {NotFoundException} Si la mascota no se encuentra o el usuario asociado no se encuentra.
+   * @throws {BadRequestException} Si la fecha de nacimiento está en el futuro.
+   */
   async updatePet(id: number, data: UpdatePetDto) {
     const { name, species, breed, birthDate, color, userid } = data;
+  
     const pet = await this.prisma.pet.findUnique({ where: { id } });
     if (!pet) {
       throw new NotFoundException(`Mascota con ID ${id} no encontrada`);
     }
+  
     if (userid) {
       const user = await this.prisma.user.findUnique({ where: { id: userid } });
       if (!user) {
         throw new NotFoundException(`Usuario con ID ${userid} no encontrado`);
       }
     }
-    const parsedBirthDate = new Date(birthDate);
-    const today = new Date();
-    if (parsedBirthDate > today) {
-      throw new BadRequestException('La fecha de nacimiento no puede estar en el futuro');
+  
+    let parsedBirthDate = pet.birthDate;
+  
+    if (birthDate) {
+      parsedBirthDate = new Date(birthDate);
+      const today = new Date();
+      if (parsedBirthDate > today) {
+        throw new BadRequestException('La fecha de nacimiento no puede estar en el futuro');
+      }
     }
+  
     const updatedPet = await this.prisma.pet.update({
       where: { id },
       data: {
@@ -117,12 +150,19 @@ export class PetsService {
         userid
       },
     });
+  
     return {
       message: 'Mascota actualizada exitosamente',
       pet: updatedPet,
     };
   }
-
+  
+  /**
+   * Elimina una mascota por ID.
+   * @param id ID de la mascota a eliminar.
+   * @returns Mensaje de éxito y datos de la mascota eliminada.
+   * @throws {NotFoundException} Si la mascota no se encuentra.
+   */
   async deletePet(id: number) {
     const pet = await this.prisma.pet.findUnique({ where: { id } });
     if (!pet) {
