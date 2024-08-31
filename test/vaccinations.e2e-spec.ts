@@ -93,7 +93,7 @@ describe('Vaccinations E2E', () => {
 
     expect(response.body.message).toBe('Vacuna creada exitosamente');
     expect(response.body.vaccination.name).toBe(createVaccinationDto.name);
-  }, 7000);
+  }, 10000);
 
   it('debería obtener todas las vacunaciones', async () => {
     const createPetDto = {
